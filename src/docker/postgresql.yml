@@ -1,0 +1,20 @@
+version: '2'
+services:
+  salle-postgresql-dev:
+    image: bitnami/postgresql:latest
+    container_name: postgresql-salle
+    environment:
+      - POSTGRESQL_DATABASE=salleDb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/bitnami/postgresql/data
+    ports:
+      - 5435:5432
+  salle-pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-salle
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"

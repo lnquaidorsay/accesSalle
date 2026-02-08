@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: salle
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: none  # Désactive la création automatique de tables par Hibernate
+    show-sql: true
+  liquibase:
+    change-log: classpath:db/changelog/master.xml  # Chemin vers le fichier master.xml
+    enabled: true  # Active Liquibase

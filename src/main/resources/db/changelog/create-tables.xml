@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1" author="jeanrobert">
+        <!-- Tables existantes -->
+        <createTable tableName="employe">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nom" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="prenom" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="service" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fonction" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="matricule" type="varchar(10)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="document">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nom_document" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="chemin_document" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Nouvelle table pour les logs de connexion -->
+        <createTable tableName="connexion_log">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="matricule" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_connexion" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

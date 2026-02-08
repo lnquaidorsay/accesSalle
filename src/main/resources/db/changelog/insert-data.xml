@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="2" author="jeanrobert">
+        <insert tableName="employe">
+            <column name="nom" value="LELO"/>
+            <column name="prenom" value="Jean Robert"/>
+            <column name="service" value="IT"/>
+            <column name="fonction" value="Développeur"/>
+            <column name="email" value="jeanrobert.lelo@example.com"/>
+            <column name="matricule" value="1234567890"/>
+        </insert>
+
+        <insert tableName="document">
+            <column name="nom_document" value="Document 1"/>
+            <column name="chemin_document" value="/documents/document1.pdf"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

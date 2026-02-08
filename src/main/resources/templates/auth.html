@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            color: white;
+        }
+        #authContainer {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 20;
+        }
+        #authForm {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #authForm.visible {
+            display: flex;
+        }
+        input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<!-- Bouton Identifiez-vous -->
+<div id="authContainer">
+    <button id="loginButton" onclick="showAuthForm()">Identifiez-vous</button>
+    <div id="authForm">
+        <input type="text" id="matricule" placeholder="Saisissez votre matricule" maxlength="10">
+        <div id="errorMessage" class="error"></div>
+        <button onclick="validateMatricule()">Valider</button>
+    </div>
+</div>
+
+<!-- Menu caché -->
+<div id="menu" th:style="${isAuthenticated} ? 'opacity:1; pointer-events:auto' : 'opacity:0; pointer-events:none'">
+    <button onclick="goToPage('page1')">Page1</button>
+    <button onclick="goToPage('page2')">Page2</button>
+    <button onclick="goToPage('page3')">Page3</button>
+    <button onclick="goToPage('page4')">Page4</button>
+</div>
+
+<!-- Vidéos -->
+<div id="videoContainer">
+    <video class="videoItem" src="/images/vid1.mp4" autoplay muted loop></video>
+</div>
+
+<!-- Pages -->
+<div id="page1" class="page">
+    <h2>Page1</h2>
+    <img src="/images/page1.png" style="width:90%;max-width:1200px;">
+    <button class="retour" onclick="returnAccueil()">Retour</button>
+</div>
+<!-- ... (autres pages) -->
+
+<!-- PDF.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.88/pdf.min.js"></script>
+<script>
+    let isAuthenticated = false;
+    let inactivity = 0;
+    let menuTimeout;
+
+    // Afficher le formulaire d'authentification
+    function showAuthForm() {
+        document.getElementById('authForm').classList.add('visible');
+        document.getElementById('loginButton').style.display = 'none';
+    }
+
+    // Valider le matricule
+    function validateMatricule() {
+        const matricule = document.getElementById('matricule').value;
+        fetch('/api/auth/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ matricule: matricule })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.matricule) {
+                    // Succès : afficher le menu
+                    isAuthenticated = true;
+                    document.getElementById('menu').style.opacity = '1';
+                    document.getElementById('menu').style.pointerEvents = 'auto';
+                    document.getElementById('authForm').classList.remove('visible');
+                } else {
+                    // Erreur : afficher le message
+                    document.getElementById('errorMessage').textContent = data.matricule || "Utilisateur inconnu";
+                }
+            })
+            .catch(error => {
+                document.getElementById('errorMessage').textContent = "Erreur de connexion";
+            });
+    }
+
+    // Logique de navigation et inactivité (identique à votre code JS existant)
+    function goToPage(id) {
+        document.getElementById('videoContainer').style.display = 'none';
+        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        resetMenuTimer();
+    }
+
+    function returnAccueil() {
+        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        document.getElementById('videoContainer').style.display = 'block';
+    }
+
+    function resetMenuTimer() {
+        clearTimeout(menuTimeout);
+        menuTimeout = setTimeout(() => {
+            isAuthenticated = false;
+            document.getElementById('menu').style.opacity = '0';
+            document.getElementById('menu').style.pointerEvents = 'none';
+            document.getElementById('loginButton').style.display = 'block';
+        }, 120000); // 2 minutes
+    }
+
+    // Gestion de l'inactivité
+    setInterval(() => {
+        inactivity++;
+        if (inactivity >= 120 && isAuthenticated) {
+            returnAccueil();
+            isAuthenticated = false;
+            document.getElementById('menu').style.opacity = '0';
+            document.getElementById('menu').style.pointerEvents = 'none';
+            document.getElementById('loginButton').style.display = 'block';
+        }
+    }, 1000);
+
+    // Réinitialiser le timer sur interaction
+    ['click', 'mousemove', 'keypress'].forEach(evt => {
+        document.addEventListener(evt, () => {
+            inactivity = 0;
+            if (isAuthenticated) resetMenuTimer();
+        });
+    });
+</script>
+</body>
+</html>
