@@ -15,7 +15,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Désactive CSRF pour simplifier les tests (à activer en production)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/auth", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/auth", "/css/**", "/js/**", "/images/**","/documents/**").permitAll()
                         .requestMatchers("/api/**").permitAll() // Permet l'accès aux endpoints API
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Autorise Swagger UI
                         .anyRequest().authenticated()
