@@ -1,200 +1,142 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Authentification</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        html, body { width: 100%; height: 100%; background: #000; overflow: hidden; color: white; }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            overflow: hidden;
-            color: white;
-        }
-
-        /* Menu latéral */
         #menu {
-            position: absolute;
-            top: 50%;
-            left: 20px;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
+            position: absolute; top: 50%; left: 20px; transform: translateY(-50%);
+            display: flex; flex-direction: column;
             background: rgba(0, 0, 0, 0.45);
-            border-radius: 16px;
-            padding: 15px;
+            border-radius: 16px; padding: 15px;
             z-index: 10;
-            opacity: 0;
-            pointer-events: none;
+            opacity: 0; pointer-events: none;
             transition: opacity 0.4s ease;
         }
-
-        #menu.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        #menu.visible { opacity: 1; pointer-events: auto; }
         #menu button {
-            margin: 10px 0;
-            padding: 16px 28px;
-            font-size: 18px;
-            color: #fff;
+            margin: 10px 0; padding: 16px 28px; font-size: 18px; color: #fff;
             background: rgba(40, 40, 40, 0.8);
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
+            border: none; border-radius: 12px; cursor: pointer;
         }
+        #menu button:hover { background: rgba(90, 90, 90, 0.9); }
 
-        #menu button:hover {
-            background: rgba(90, 90, 90, 0.9);
-        }
-
-        /* Conteneur d'authentification */
         #authContainer {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            position: absolute; top: 20px; right: 20px;
             background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 10px;
+            padding: 10px; border-radius: 10px;
             z-index: 20;
         }
-
         #loginButton {
             background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
+            border: none; border-radius: 5px;
             cursor: pointer;
         }
-
         #authForm {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
+            display: none; flex-direction: column; gap: 10px;
             background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
+            padding: 20px; border-radius: 10px;
             margin-top: 10px;
         }
-
-        #authForm.visible {
-            display: flex;
-        }
-
-        #authForm input {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-
+        #authForm.visible { display: flex; }
+        #authForm input { padding: 10px; border-radius: 5px; border: none; }
         #authForm button {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background: #4CAF50;
-            color: white;
-            cursor: pointer;
+            padding: 10px; border-radius: 5px; border: none;
+            background: #4CAF50; color: white; cursor: pointer;
         }
+        .error { color: red; }
 
-        .error {
-            color: red;
-        }
-
-        /* Conteneur des pages */
         #videoContainer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
             overflow-y: auto;
             scroll-snap-type: y mandatory;
         }
-
         .videoItem {
-            width: 100%;
-            height: 100vh;
+            width: 100%; height: 100vh;
             object-fit: cover;
             scroll-snap-align: start;
         }
 
-        /* Pages */
         .page {
             display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #111;
-            color: #fff;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #111; color: #fff;
             z-index: 5;
             overflow: auto;
             padding: 25px;
             text-align: center;
         }
+        .page h2 { margin-bottom: 20px; }
 
-        .page h2 {
-            margin-bottom: 20px;
-        }
-
-        /* Carrousel */
         .carousel-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .carousel-block {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px;
-            width: 100%;
+            position: relative;
+            display: flex; flex-direction: row;
+            align-items: center; justify-content: center;
+            height: 100%; width: 100%;
             max-width: 1200px;
+            margin: 0 auto;
         }
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        .carousel-nav button {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .carousel-nav button:hover { background: rgba(0, 0, 0, 0.8); }
 
-        .carousel-block img {
+        .carousel-left { flex: 0 0 40%; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .carousel-right { flex: 1; display: flex; overflow-x: auto; padding: 10px; gap: 10px; scroll-behavior: smooth; }
+
+        .carousel-right::-webkit-scrollbar { height: 10px; }
+        .carousel-right::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .carousel-right::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        .carousel-right::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .carousel-left img, .carousel-right img {
             max-width: 100%;
-            max-height: 400px;
+            height: 300px;
+            object-fit: cover;
             margin: 10px;
             cursor: pointer;
             border-radius: 10px;
             transition: transform 0.3s;
         }
+        .carousel-left img:hover, .carousel-right img:hover { transform: scale(1.05); }
 
-        .carousel-block img:hover {
-            transform: scale(1.05);
-        }
-
-        /* PDF Viewer */
         .pdf-viewer {
             width: 100%;
             height: 80vh;
             margin: 20px auto;
             border: 1px solid #ccc;
             overflow: auto;
+            background: #fff; /* pour voir le canvas */
         }
+        .pdf-viewer canvas { display: block; margin: 0 auto; }
 
-        .pdf-viewer canvas {
-            display: block;
-            margin: 0 auto;
-        }
-
-        /* Bouton Retour */
         .retour {
             margin: 25px 0;
             padding: 14px 36px;
@@ -205,14 +147,19 @@
             border-radius: 12px;
             cursor: pointer;
         }
-
-        .retour:hover {
-            background: #555;
-        }
+        .retour:hover { background: #555; }
     </style>
+
+    <!-- PDF.js 5.x via WebJars (.mjs) -->
+    <script type="module">
+        import * as pdfjsLib from "/webjars/pdfjs-dist/5.4.624/build/pdf.min.mjs";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "/webjars/pdfjs-dist/5.4.624/build/pdf.worker.min.mjs";
+        window.pdfjsLib = pdfjsLib;
+        window.pdfjsReady = Promise.resolve(pdfjsLib);
+    </script>
 </head>
+
 <body>
-<!-- Menu caché -->
 <div id="menu">
     <button onclick="goToPage('page1')">Organigramme</button>
     <button onclick="goToPage('page2')">Activités</button>
@@ -220,7 +167,6 @@
     <button onclick="goToPage('page4')">Offres d'emploi</button>
 </div>
 
-<!-- Conteneur d'authentification -->
 <div id="authContainer">
     <button id="loginButton" onclick="showAuthForm()">Identifiez-vous</button>
     <div id="authForm">
@@ -230,23 +176,25 @@
     </div>
 </div>
 
-<!-- Vidéos -->
 <div id="videoContainer">
     <video class="videoItem" src="/images/vid1.mp4" autoplay muted loop></video>
 </div>
 
-<!-- Pages -->
 <div id="page1" class="page">
     <h2>Organigramme</h2>
     <div class="carousel-container">
-        <div class="carousel-block">
-            <img src="/images/digital-marketing.jpg" onclick="openPDF('organigramme.pdf')">
+        <div class="carousel-nav">
+            <button onclick="scrollCarousel(-1)">&#10094;</button>
+            <button onclick="scrollCarousel(1)">&#10095;</button>
         </div>
-        <div class="carousel-block">
-            <img src="/images/young-woman.jpg" onclick="openPDF('python.pdf')">
-            <img src="/images/technology.jpg" onclick="openPDF('react_js.pdf')">
-            <img src="/images/coding.jpg" onclick="openPDF('scrum.pdf')">
-            <img src="/images/monitor.jpg" onclick="openPDF('uml.pdf')">
+        <div class="carousel-left">
+            <img src="/images/digital-marketing.jpg" onclick="openPDF('organigramme')">
+        </div>
+        <div class="carousel-right" id="carouselRight">
+            <img src="/images/young-woman.jpg" onclick="openPDF('python')">
+            <img src="/images/technology.jpg" onclick="openPDF('react_js')">
+            <img src="/images/coding.jpg" onclick="openPDF('scrum')">
+            <img src="/images/monitor.jpg" onclick="openPDF('uml')">
         </div>
     </div>
     <div id="pdfViewer" class="pdf-viewer"></div>
@@ -255,77 +203,70 @@
 
 <div id="page2" class="page">
     <h2>Activités</h2>
-    <img src="/images/techno.jpg" onclick="openPDF('uml.pdf')">
+    <img src="/images/techno.jpg" onclick="openPDF('uml')">
     <div id="pdfViewerActivites" class="pdf-viewer"></div>
     <button class="retour" onclick="returnAccueil()">Retour</button>
 </div>
 
 <div id="page3" class="page">
     <h2>Communiqués</h2>
-    <img src="/images/engineer.jpg" onclick="openPDF('uml.pdf')">
+    <img src="/images/engineer.jpg" onclick="openPDF('scrum')">
     <div id="pdfViewerCommuniques" class="pdf-viewer"></div>
     <button class="retour" onclick="returnAccueil()">Retour</button>
 </div>
 
 <div id="page4" class="page">
     <h2>Offres d'emploi</h2>
-    <img src="/images/networking.jpg" onclick="openPDF('uml.pdf')">
+    <img src="/images/networking.jpg" onclick="openPDF('python')">
     <div id="pdfViewerOffres" class="pdf-viewer"></div>
     <button class="retour" onclick="returnAccueil()">Retour</button>
 </div>
 
-<!-- PDF.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.88/pdf.min.js"></script>
 <script>
     let isAuthenticated = false;
     let inactivity = 0;
     let inactivityTimeout;
+    let currentPageId = null;
 
-    // Afficher le formulaire d'authentification
     function showAuthForm() {
         document.getElementById('authForm').classList.add('visible');
         document.getElementById('loginButton').style.display = 'none';
         resetInactivityTimer();
     }
 
-    // Valider le matricule
     function validateMatricule() {
         const matricule = document.getElementById('matricule').value;
+
         fetch('/api/auth/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ matricule: matricule })
+            body: JSON.stringify({ matricule })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.matricule) {
-                    // Succès : afficher le menu et cacher le formulaire d'authentification
-                    isAuthenticated = true;
-                    document.getElementById('menu').classList.add('visible');
-                    document.getElementById('authForm').classList.remove('visible');
-                    resetInactivityTimer();
-                } else {
-                    // Erreur : afficher le message
-                    document.getElementById('errorMessage').textContent = data.matricule || "Utilisateur inconnu";
-                }
+            .then(r => {
+                if (!r.ok) return r.text().then(t => { throw new Error(t || 'Erreur auth'); });
+                return r.json();
             })
-            .catch(error => {
-                document.getElementById('errorMessage').textContent = "Erreur de connexion";
+            .then(_data => {
+                isAuthenticated = true;
+                document.getElementById('menu').classList.add('visible');
+                document.getElementById('authForm').classList.remove('visible');
+                resetInactivityTimer();
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('errorMessage').textContent = "Utilisateur inconnu / erreur";
             });
     }
 
-    // Réinitialiser le timer d'inactivité
     function resetInactivityTimer() {
         clearTimeout(inactivityTimeout);
         inactivity = 0;
-        inactivityTimeout = setTimeout(() => {
-            resetSession();
-        }, 120000); // 2 minutes
+        inactivityTimeout = setTimeout(resetSession, 120000);
     }
 
-    // Réinitialiser la session
     function resetSession() {
         isAuthenticated = false;
+        currentPageId = null;
         document.getElementById('menu').classList.remove('visible');
         document.getElementById('authForm').classList.remove('visible');
         document.getElementById('loginButton').style.display = 'block';
@@ -335,103 +276,86 @@
         document.getElementById('videoContainer').style.display = 'block';
     }
 
-    // Navigation
     function goToPage(id) {
+        currentPageId = id;
         document.getElementById('videoContainer').style.display = 'none';
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
         document.getElementById(id).style.display = 'block';
         resetInactivityTimer();
-
-        // Charger le PDF correspondant à la page
-        if (id === 'page2') {
-            loadPDF('/api/documents/file?cheminDocument=documents/activites.pdf', 'pdfViewerActivites');
-        } else if (id === 'page3') {
-            loadPDF('/api/documents/file?cheminDocument=documents/communiques.pdf', 'pdfViewerCommuniques');
-        } else if (id === 'page4') {
-            loadPDF('/api/documents/file?cheminDocument=documents/offres_emploi.pdf', 'pdfViewerOffres');
-        }
     }
 
-    // Retour à l'accueil
     function returnAccueil() {
+        currentPageId = null;
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
         document.getElementById('videoContainer').style.display = 'block';
         resetInactivityTimer();
     }
 
-    // Ouvrir un PDF
-    function openPDF(pdfName) {
-        fetch(`/api/documents/path?nomDocument=${pdfName}`)
-            .then(response => response.text())
-            .then(path => {
-                loadPDF(`/api/documents/file?cheminDocument=${path}`, 'pdfViewer');
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-            });
+    function scrollCarousel(direction) {
+        document.getElementById('carouselRight').scrollLeft += direction * 300;
     }
 
-    // Charger un PDF
-    function loadPDF(pdfPath, viewerId) {
-        const container = document.getElementById(viewerId);
-        container.innerHTML = '';
+    function viewerIdForPage() {
+        if (currentPageId === 'page2') return 'pdfViewerActivites';
+        if (currentPageId === 'page3') return 'pdfViewerCommuniques';
+        if (currentPageId === 'page4') return 'pdfViewerOffres';
+        return 'pdfViewer';
+    }
 
-        if (pdfPath.startsWith('http')) {
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(pdfPath)}&embedded=true`;
-            iframe.width = '100%';
-            iframe.height = '100%';
-            container.appendChild(iframe);
-        } else {
-            fetch(pdfPath)
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    pdfjsLib.getDocument(url).promise.then(pdf => {
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            pdf.getPage(i).then(page => {
-                                const viewport = page.getViewport({ scale: 1.5 });
-                                const canvas = document.createElement('canvas');
-                                const context = canvas.getContext('2d');
-                                canvas.width = viewport.width;
-                                canvas.height = viewport.height;
-                                page.render({
-                                    canvasContext: context,
-                                    viewport: viewport,
-                                });
-                                container.appendChild(canvas);
-                            });
-                        }
-                    }).catch(error => {
-                        console.error('Erreur lors du chargement du PDF:', error);
-                        container.innerHTML = '<p>Erreur lors du chargement du PDF.</p>';
-                    });
-                })
-                .catch(error => {
-                    console.error('Erreur lors de la récupération du PDF:', error);
-                    container.innerHTML = '<p>Erreur lors de la récupération du PDF.</p>';
-                });
+    async function getPdfJsLib() {
+        if (window.pdfjsReady) return await window.pdfjsReady;
+        if (window.pdfjsLib) return window.pdfjsLib;
+        throw new Error("PDF.js non chargé");
+    }
+
+    function openPDF(nomDocument) {
+        const viewerId = viewerIdForPage();
+        const url = `/api/documents/file?nomDocument=${encodeURIComponent(nomDocument)}`;
+        loadPDF(url, viewerId);
+    }
+
+    async function loadPDF(pdfUrl, viewerId) {
+        const container = document.getElementById(viewerId);
+        container.innerHTML = "<p>Chargement du PDF...</p>";
+
+        try {
+            const pdfjsLib = await getPdfJsLib();
+
+            const pdf = await pdfjsLib.getDocument({
+                url: pdfUrl,
+                withCredentials: true
+            }).promise;
+
+            container.innerHTML = "";
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                container.appendChild(canvas);
+
+                await page.render({ canvasContext: ctx, viewport }).promise;
+            }
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = "<p>Impossible d'afficher le PDF.</p>";
         }
     }
 
-    // Gestion de l'inactivité
     setInterval(() => {
         inactivity++;
-        if (inactivity >= 120) {
-            resetSession();
-        }
+        if (inactivity >= 120) resetSession();
     }, 1000);
 
-    // Réinitialiser le timer sur interaction
-    ['click', 'mousemove', 'keypress', 'keydown', 'scroll'].forEach(evt => {
-        document.addEventListener(evt, () => {
-            resetInactivityTimer();
-        });
+    ['click','mousemove','keypress','keydown','scroll'].forEach(evt => {
+        document.addEventListener(evt, resetInactivityTimer);
     });
 
-    // Initialiser le timer
-    resetInactivityTimer();
+    window.onload = () => resetInactivityTimer();
 </script>
 </body>
 </html>
-

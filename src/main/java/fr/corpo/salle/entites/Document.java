@@ -1,5 +1,6 @@
 package fr.corpo.salle.entites;
 
+import fr.corpo.salle.enums.DocumentSourceType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,9 +16,17 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name="nom_document", nullable = false, unique = true)
     private String nomDocument;
 
-    @Column(nullable = false)
-    private String cheminDocument;
+    @Enumerated(EnumType.STRING)
+    @Column(name="source_type", nullable = false)
+    private DocumentSourceType sourceType;
+
+    /**
+     * FILE : chemin relatif dans app.documents.storage-dir (ex: "orga/organigramme.pdf")
+     * URL  : URL complète (ex: "https://.../file.pdf")
+     */
+    @Column(name="location", nullable = false, length = 2000)
+    private String location;
 }

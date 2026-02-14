@@ -5,8 +5,15 @@ spring:
     active: dev
   jpa:
     hibernate:
-      ddl-auto: none  # Désactive la création automatique de tables par Hibernate
+      ddl-auto: none
     show-sql: true
   liquibase:
-    change-log: classpath:db/changelog/master.xml  # Chemin vers le fichier master.xml
-    enabled: true  # Active Liquibase
+    change-log: classpath:db/changelog/master.xml
+    enabled: true
+
+app:
+  documents:
+    # liste de domaines autorisés (anti-SSRF)
+    allowed-url-hosts:
+      - sharepoint.com
+      - yourtenant.sharepoint.com

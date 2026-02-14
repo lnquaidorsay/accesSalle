@@ -6,4 +6,5 @@
 
     <include file="create-tables.xml" relativeToChangelogFile="true"/>
     <include file="insert-data.xml" relativeToChangelogFile="true"/>
+    <include file="update-document-schema.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

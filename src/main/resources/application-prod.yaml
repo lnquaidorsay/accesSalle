@@ -4,3 +4,7 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+
+app:
+  documents:
+    storage-dir: "/var/app/salle/documents"  # <-- dossier externe prod

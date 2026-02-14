@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="3" author="jeanrobert">
+        <!-- 1) Ajouter d'abord en NULLABLE -->
+        <addColumn tableName="document">
+            <column name="source_type" type="varchar(10)" defaultValue="FILE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="varchar(2000)"/>
+        </addColumn>
+
+        <!-- 2) Migrer les valeurs existantes : location = chemin_document -->
+        <sql>
+            UPDATE document
+            SET location = chemin_document
+            WHERE location IS NULL;
+        </sql>
+
+        <!-- 3) Si location est une URL => URL -->
+        <sql>
+            UPDATE document
+            SET source_type = 'URL'
+            WHERE location ILIKE 'http%';
+        </sql>
+
+        <!-- 4) Si FILE : rendre relatif (enlever /documents/) -->
+        <sql>
+            UPDATE document
+            SET location = regexp_replace(location, '^/documents/', '')
+            WHERE source_type = 'FILE';
+        </sql>
+
+        <!-- 5) Sécurité : si malgré tout il reste des NULL, on force une valeur (sinon setNotNull échoue)
+             Adapte si tu veux plutôt supprimer ces lignes -->
+        <sql>
+            UPDATE document
+            SET location = 'MISSING.pdf'
+            WHERE location IS NULL OR btrim(location) = '';
+        </sql>
+
+        <!-- 6) Maintenant seulement : contrainte NOT NULL -->
+        <addNotNullConstraint tableName="document" columnName="location" columnDataType="varchar(2000)"/>
+
+        <!-- Optionnel : si tu veux supprimer l'ancienne colonne plus tard
+        <dropColumn tableName="document" columnName="chemin_document"/>
+        -->
+    </changeSet>
+
+</databaseChangeLog>

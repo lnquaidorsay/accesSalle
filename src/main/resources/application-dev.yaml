@@ -5,9 +5,12 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
-
 logging:
   level:
     org.springframework.security: TRACE
     org.springframework.security.web.access: TRACE
     org.springframework.security.authentication: TRACE
+
+app:
+  documents:
+    storage-dir: "C:/salle-documents"   # <-- dossier externe local

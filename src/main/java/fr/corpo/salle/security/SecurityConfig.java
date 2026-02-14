@@ -13,20 +13,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Désactive CSRF pour simplifier les tests (à activer en production)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/auth", "/css/**", "/js/**", "/images/**","/documents/**").permitAll()
-                        .requestMatchers("/api/**").permitAll() // Permet l'accès aux endpoints API
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Autorise Swagger UI
-                        .anyRequest().authenticated()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/auth").permitAll()
+
+                        // ✅ statiques
+                        .requestMatchers("/css/**").permitAll()
+                        .requestMatchers("/js/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/documents/**").permitAll()
+                        .requestMatchers("/pdfjs/**").permitAll()
+
+                        // ✅ AJOUT: WebJars
+                        .requestMatchers("/webjars/**").permitAll()
+
+                        // ✅ API
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/documents/**").permitAll()
+
+                        // ✅ Swagger
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+
+                        .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .permitAll()
                 )
-                .logout(logout -> logout
-                        .permitAll()
-                );
+                .logout(logout -> logout.permitAll());
+
         return http.build();
     }
 }
